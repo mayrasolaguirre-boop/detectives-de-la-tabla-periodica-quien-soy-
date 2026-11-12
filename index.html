@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detectives de la Tabla Periódica: ¿Quién Soy?</title>
+<style>
+  :root {
+    --bg-dark: #0b1120;
+    --bg-panel: #131c31;
+    --bg-card: #1a253c;
+    --bg-card-hover: #22304d;
+    --border-color: #2d3f63;
+    --accent-cyan: #38bdf8;
+    --accent-cyan-glow: rgba(56, 189, 248, 0.25);
+    --accent-amber: #fbbf24;
+    --accent-emerald: #10b981;
+    --accent-rose: #f43f5e;
+    --accent-violet: #a78bfa;
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+    --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-dark);
+    background-image: 
+      radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.08) 0%, transparent 45%),
+      radial-gradient(circle at 85% 85%, rgba(167, 139, 250, 0.08) 0%, transparent 45%),
+      linear-gradient(rgba(30, 41, 59, 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 41, 59, 0.3) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.25rem 1rem;
+    line-height: 1.5;
+  }
+
+  .app-container {
+    width: 100%;
+    max-width: 1180px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* Header estilo Laboratorio */
+  header {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 0.9rem 1.4rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .brand-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #0284c7, #38bdf8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0b1120;
+    box-shadow: 0 0 15px var(--accent-cyan-glow);
+    flex-shrink: 0;
+  }
+
+  .brand-text h1 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: var(--text-main);
+  }
+
+  .brand-text span {
+    font-size: 0.76rem;
+    color: var(--accent-cyan);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .hud-stats {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .hud-box {
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.4rem 0.85rem;
+    text-align: center;
+    min-width: 90px;
+  }
+
+  .hud-label {
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .hud-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--accent-cyan);
+  }
+
+  .hud-value.score {
+    color: var(--accent-amber);
+  }
+
+  /* Barra de Progreso */
+  .progress-track {
+    width: 100%;
+    height: 6px;
+    background: var(--bg-card);
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #0284c7, #38bdf8, #10b981);
+    transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Pantallas */
+  .screen {
+    display: none;
+    animation: fadeIn 0.35s ease;
+  }
+
+  .screen.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Pantalla de Inicio */
+  .intro-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.5);
+  }
+
+  .intro-hero {
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 1.5rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 720px) {
+    .intro-hero {
+      grid-template-columns: 1fr;
+    }
+    .intro-illustration {
+      max-width: 200px;
+      margin: 0 auto;
+    }
+  }
+
+  .intro-illustration {
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mission-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: var(--accent-cyan);
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    margin-bottom: 0.85rem;
+  }
+
+  .intro-card h2 {
+    font-size: 1.7rem;
+    margin-bottom: 0.65rem;
+    color: #fff;
+  }
+
+  .intro-desc {
+    color: var(--text-muted);
+    font-size: 0.98rem;
+    max-width: 68ch;
+  }
+
+  .categories-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cat-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+  }
+
+  .cat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .cat-box h3 {
+    font-size: 0.92rem;
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .cat-box p {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .dot-metal { background: var(--accent-amber); }
+  .dot-nonmetal { background: var(--accent-emerald); }
+  .dot-noble { background: var(--accent-violet); }
+
+  .config-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+  }
+
+  .config-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .config-group label {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  select {
+    background: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.5rem 0.85rem;
+    font-size: 0.9rem;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    outline: none;
+  }
+
+  select:focus {
+    border-color: var(--accent-cyan);
+  }
+
+  /* Botones */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 0.93rem;
+    padding: 0.7rem 1.35rem;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #0284c7, #38bdf8);
+    color: #0b1120;
+    box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(56, 189, 248, 0.45);
+  }
+
+  .btn-secondary {
+    background: var(--bg-card);
+    color: var(--accent-amber);
+    border: 1px solid rgba(251, 191, 36, 0.45);
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    background: rgba(251, 191, 36, 0.14);
+  }
+
+  .btn-secondary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+    padding: 0.42rem 0.85rem;
+    font-size: 0.82rem;
+  }
+
+  .btn-ghost:hover {
+    color: var(--text-main);
+    border-color: var(--text-muted);
+  }
+
+  /* ================= PANTALLA DIVIDIDA EN 2 COLUMNAS ================= */
+  .split-workspace {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  @media (max-width: 860px) {
+    .split-workspace {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* COLUMNA IZQUIERDA: Pistas + Opciones de Símbolos */
+  .left-panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.45);
+  }
+
+  .case-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.6rem;
+    padding-bottom: 0.9rem;
+    margin-bottom: 1.1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .case-title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .case-id {
+    background: var(--bg-dark);
+    border: 1px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+  }
+
+  .case-subtitle {
+    font-size: 0.98rem;
+    font-weight: 600;
+  }
+
+  .potential-points {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--accent-amber);
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.28);
+    padding: 0.28rem 0.65rem;
+    border-radius: 8px;
+  }
+
+  /* Tarjetas de Pistas (de una a la vez) */
+  .clues-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .clue-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--accent-cyan);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    animation: slideIn 0.3s ease;
+  }
+
+  .clue-card.extra-clue {
+    border-left-color: var(--accent-amber);
+    background: rgba(251, 191, 36, 0.05);
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .clue-type-badge {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    background: var(--bg-dark);
+    color: var(--accent-cyan);
+    border: 1px solid var(--border-color);
+    white-space: nowrap;
+    margin-top: 0.1rem;
+  }
+
+  .clue-card.extra-clue .clue-type-badge {
+    color: var(--accent-amber);
+    border-color: rgba(251, 191, 36, 0.4);
+  }
+
+  .clue-text {
+    font-size: 0.93rem;
+    color: var(--text-main);
+  }
+
+  .hint-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 1.35rem;
+    padding: 0.65rem 0.85rem;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+  }
+
+  .hint-info {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .options-section-title {
+    font-size: 0.84rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    margin-bottom: 0.75rem;
+  }
+
+  .symbols-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.8rem;
+  }
+
+  @media (max-width: 520px) {
+    .symbols-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .symbol-btn {
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.15rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    position: relative;
+    color: var(--text-main);
+  }
+
+  .symbol-btn:hover:not(:disabled) {
+    background: var(--bg-card-hover);
+    border-color: var(--accent-cyan);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(56, 189, 248, 0.2);
+  }
+
+  .symbol-btn:disabled {
+    cursor: default;
+  }
+
+  .symbol-text {
+    font-size: 2.15rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+  }
+
+  .symbol-corner {
+    position: absolute;
+    top: 7px;
+    left: 9px;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-dim);
+  }
+
+  .symbol-btn.correct {
+    background: rgba(16, 185, 129, 0.18);
+    border-color: var(--accent-emerald);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+  }
+
+  .symbol-btn.incorrect {
+    background: rgba(244, 63, 94, 0.18);
+    border-color: var(--accent-rose);
+    color: #fff;
+  }
+
+  .symbol-btn.dimmed {
+    opacity: 0.45;
+  }
+
+  /* COLUMNA DERECHA: Visor de Muestra + Panel de Resultado y Explicación */
+  .right-panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.45);
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    min-height: 460px;
+  }
+
+  .right-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .right-panel-title {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-cyan);
+  }
+
+  /* Estado en espera (antes de responder) */
+  .standby-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: var(--bg-dark);
+    border: 1px dashed var(--border-color);
+    border-radius: 14px;
+    gap: 1rem;
+  }
+
+  .scanner-frame {
+    width: 170px;
+    height: 170px;
+    border-radius: 16px;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(11, 17, 32, 0.9) 75%);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .scan-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+    box-shadow: 0 0 8px var(--accent-cyan);
+    animation: scanMove 2.6s ease-in-out infinite;
+  }
+
+  @keyframes scanMove {
+    0%, 100% { top: 12%; }
+    50% { top: 88%; }
+  }
+
+  .standby-box h3 {
+    font-size: 1.05rem;
+    color: var(--text-main);
+  }
+
+  .standby-box p {
+    font-size: 0.86rem;
+    color: var(--text-muted);
+    max-width: 34ch;
+  }
+
+  /* Panel de Devolución / Ficha Científica (cuando responde) */
+  .feedback-panel {
+    display: none;
+    flex-direction: column;
+    gap: 1rem;
+    animation: fadeIn 0.35s ease;
+  }
+
+  .feedback-panel.visible {
+    display: flex;
+  }
+
+  .feedback-banner {
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+  }
+
+  .feedback-banner.is-correct {
+    border-color: rgba(16, 185, 129, 0.55);
+    background: rgba(16, 185, 129, 0.1);
+  }
+
+  .feedback-banner.is-wrong {
+    border-color: rgba(244, 63, 94, 0.55);
+    background: rgba(244, 63, 94, 0.1);
+  }
+
+  .feedback-status {
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+
+  .feedback-status.ok { color: var(--accent-emerald); }
+  .feedback-status.fail { color: var(--accent-rose); }
+
+  .points-earned {
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    background: var(--bg-card);
+    color: var(--accent-amber);
+  }
+
+  /* Ilustración del elemento + Ficha periódica */
+  .visual-dossier-top {
+    display: grid;
+    grid-template-columns: 105px 1fr;
+    gap: 0.9rem;
+    align-items: stretch;
+  }
+
+  .pt-tile {
+    background: var(--bg-card);
+    border: 2px solid var(--accent-cyan);
+    border-radius: 12px;
+    padding: 0.65rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .pt-tile.metal { border-color: var(--accent-amber); }
+  .pt-tile.nonmetal { border-color: var(--accent-emerald); }
+  .pt-tile.noble { border-color: var(--accent-violet); }
+
+  .pt-z {
+    align-self: flex-start;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--text-muted);
+  }
+
+  .pt-sym {
+    font-size: 2.1rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 0.1rem 0;
+  }
+
+  .pt-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-main);
+  }
+
+  .element-illustration-box {
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 0.65rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .element-illustration-box svg {
+    width: 100%;
+    max-width: 165px;
+    height: 82px;
+  }
+
+  .illustration-caption {
+    font-size: 0.74rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+  }
+
+  .dossier-details h4 {
+    font-size: 1.15rem;
+    margin-bottom: 0.45rem;
+    color: #fff;
+  }
+
+  .badges-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .meta-badge {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.22rem 0.65rem;
+    border-radius: 999px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+  }
+
+  .meta-badge.metal { color: var(--accent-amber); border-color: rgba(251, 191, 36, 0.4); }
+  .meta-badge.nonmetal { color: var(--accent-emerald); border-color: rgba(16, 185, 129, 0.4); }
+  .meta-badge.noble { color: var(--accent-violet); border-color: rgba(167, 139, 250, 0.4); }
+
+  .explanation-text {
+    font-size: 0.9rem;
+    color: var(--text-main);
+    line-height: 1.58;
+    background: var(--bg-dark);
+    padding: 0.9rem 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  .next-action {
+    margin-top: 0.25rem;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .next-action .btn {
+    width: 100%;
+  }
+
+  /* Pantalla Final */
+  .summary-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.5);
+  }
+
+  .summary-header {
+    text-align: center;
+    margin-bottom: 1.75rem;
+  }
+
+  .rank-badge {
+    display: inline-block;
+    background: rgba(251, 191, 36, 0.14);
+    border: 1px solid rgba(251, 191, 36, 0.45);
+    color: var(--accent-amber);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.35rem 1rem;
+    border-radius: 999px;
+    margin-bottom: 0.75rem;
+  }
+
+  .summary-header h2 {
+    font-size: 1.75rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .stat-card .num {
+    font-size: 1.75rem;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    color: var(--accent-cyan);
+  }
+
+  .stat-card .lbl {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+  }
+
+  .review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1.75rem;
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+  }
+
+  .review-item {
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .review-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .review-sym {
+    font-weight: 800;
+    font-size: 1.05rem;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+  }
+
+  .review-status {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .review-status.ok { color: var(--accent-emerald); }
+  .review-status.fail { color: var(--accent-rose); }
+
+  footer {
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    margin-top: 0.35rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Cabecera del Laboratorio -->
+  <header>
+    <div class="brand">
+      <div class="brand-badge" aria-hidden="true">
+        <!-- Ilustración ícono microscopio/átomo -->
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="2.5"/>
+          <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(30 12 12)"/>
+          <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-30 12 12)"/>
+          <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(90 12 12)"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Detectives de la tabla periódica: ¿quién soy?</h1>
+        <span>Laboratorio de Clasificación Química • 2.º Año</span>
+      </div>
+    </div>
+
+    <div class="hud-stats" id="hudStats" style="visibility: hidden;">
+      <div class="hud-box">
+        <div class="hud-label">Expediente</div>
+        <div class="hud-value" id="hudProgress">0 / 0</div>
+      </div>
+      <div class="hud-box">
+        <div class="hud-label">Puntaje</div>
+        <div class="hud-value score" id="hudScore">0</div>
+      </div>
+      <button class="btn btn-ghost" id="btnResetTop" title="Reiniciar misión">Reiniciar</button>
+    </div>
+  </header>
+
+  <div class="progress-track" id="progressTrack" style="visibility: hidden;">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <!-- PANTALLA 1: INICIO -->
+  <section id="screenIntro" class="screen active">
+    <div class="intro-card">
+      <div class="intro-hero">
+        <div>
+          <div class="mission-tag">EXPEDIENTE CIENTÍFICO • MISIÓN DE IDENTIFICACIÓN</div>
+          <h2>Bienvenidos al Laboratorio de Investigación</h2>
+          <p class="intro-desc">
+            Se han perdido las etiquetas de varios frascos y muestras del laboratorio. Cada expediente comienza con <strong>una pista inicial</strong>: si necesitás más evidencia, podés pedir pistas adicionales de a una. Analizá las propiedades, la ubicación en la tabla periódica (grupo y período) y los usos cotidianos para descubrir el <strong>símbolo químico</strong> de cada elemento.
+          </p>
+        </div>
+
+        <!-- Ilustración vectorial de laboratorio científico -->
+        <div class="intro-illustration" aria-hidden="true">
+          <svg width="180" height="145" viewBox="0 0 180 145" fill="none">
+            <!-- Matraz Erlenmeyer -->
+            <path d="M55 25 H75 M60 25 V52 L38 112 C36 117 40 122 45 122 H85 C90 122 94 117 92 112 L70 52 V25" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M44 96 L86 96 L91 112 C92 116 89 120 85 120 H45 C41 120 38 116 39 112 Z" fill="rgba(56, 189, 248, 0.25)"/>
+            <circle cx="58" cy="107" r="3" fill="#38bdf8"/>
+            <circle cx="71" cy="103" r="2.2" fill="#38bdf8"/>
+            <circle cx="64" cy="85" r="2.5" fill="#38bdf8" opacity="0.7"/>
+            <!-- Lupa de detective sobre ficha periódica -->
+            <rect x="98" y="34" width="46" height="54" rx="6" fill="#1a253c" stroke="#fbbf24" stroke-width="2"/>
+            <text x="105" y="47" fill="#94a3b8" font-family="monospace" font-size="9">Z=?</text>
+            <text x="121" y="71" text-anchor="middle" fill="#fbbf24" font-family="sans-serif" font-weight="bold" font-size="22">?</text>
+            <circle cx="128" cy="76" r="24" stroke="#10b981" stroke-width="3" fill="rgba(16, 185, 129, 0.08)"/>
+            <line x1="145" y1="93" x2="162" y2="112" stroke="#10b981" stroke-width="4.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="categories-preview">
+        <div class="cat-box">
+          <div class="cat-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2">
+              <polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2"/>
+              <line x1="12" y1="22" x2="12" y2="12"/>
+              <polyline points="21 7 12 12 3 7"/>
+            </svg>
+          </div>
+          <div>
+            <h3><span class="dot dot-metal"></span> Metales</h3>
+            <p>Brillo metálico, buenos conductores del calor y la electricidad, maleables y dúctiles. Casi todos sólidos a temperatura ambiente (con excepciones como el mercurio).</p>
+          </div>
+        </div>
+
+        <div class="cat-box">
+          <div class="cat-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+              <circle cx="8" cy="15" r="4"/>
+              <circle cx="16" cy="14" r="5"/>
+              <circle cx="12" cy="8" r="3.5"/>
+            </svg>
+          </div>
+          <div>
+            <h3><span class="dot dot-nonmetal"></span> No metales</h3>
+            <p>Sin brillo metálico, malos conductores (aislantes) y quebradizos si son sólidos. Se hallan en estado sólido, líquido o gaseoso.</p>
+          </div>
+        </div>
+
+        <div class="cat-box">
+          <div class="cat-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2">
+              <circle cx="12" cy="12" r="7"/>
+              <circle cx="12" cy="12" r="10" stroke-dasharray="3 3"/>
+            </svg>
+          </div>
+          <div>
+            <h3><span class="dot dot-noble"></span> Gases nobles</h3>
+            <p>Grupo 18 de la tabla: gases incoloros a temperatura ambiente con altísima estabilidad química, por lo que casi no reaccionan.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-bar">
+        <div class="config-group">
+          <label for="caseCountSelect">Cantidad de casos en la misión:</label>
+          <select id="caseCountSelect">
+            <option value="8">8 expedientes (Rápida)</option>
+            <option value="10" selected>10 expedientes (Estándar)</option>
+            <option value="15">15 expedientes (Completa)</option>
+            <option value="18">18 expedientes (Todos los elementos)</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" id="btnStart">Comenzar investigación</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PANTALLA 2: DESAFÍO ACTIVO (PANTALLA DIVIDIDA EN 2 COLUMNAS) -->
+  <section id="screenGame" class="screen">
+    <div class="split-workspace">
+      
+      <!-- COLUMNA IZQUIERDA: Pistas (de una a la vez) y Opciones de Símbolos -->
+      <div class="left-panel">
+        <div class="case-header">
+          <div class="case-title">
+            <span class="case-id" id="caseBadge">CASO #01</span>
+            <span class="case-subtitle">Pistas y selección de símbolo</span>
+          </div>
+          <div class="potential-points" id="potentialPointsBadge">Valor: 100 pts</div>
+        </div>
+
+        <!-- Contenedor de Pistas -->
+        <div class="clues-grid" id="cluesContainer"></div>
+
+        <!-- Control para pedir de a 1 pista por vez -->
+        <div class="hint-controls">
+          <span class="hint-info" id="hintInfoText">Pistas reveladas: 1 de 4</span>
+          <button class="btn btn-secondary" id="btnExtraClue">+ Pedir siguiente pista (-15 pts)</button>
+        </div>
+
+        <!-- Opciones de Símbolos Químicos -->
+        <div class="options-section-title">Elegí el símbolo químico correcto:</div>
+        <div class="symbols-grid" id="symbolsContainer"></div>
+      </div>
+
+      <!-- COLUMNA DERECHA: Visor de Muestra + Devolución (Acierto/Error y Descripción) -->
+      <div class="right-panel">
+        <div class="right-panel-header">
+          <span class="right-panel-title">Análisis y Expediente Técnico</span>
+          <span style="font-family: var(--font-mono); font-size: 0.74rem; color: var(--text-dim);" id="rightStatusTag">ESPERANDO HIPÓTESIS</span>
+        </div>
+
+        <!-- Vista previa mientras el estudiante investiga -->
+        <div class="standby-box" id="standbyBox">
+          <div class="scanner-frame" aria-hidden="true">
+            <div class="scan-line"></div>
+            <svg width="96" height="96" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="36" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="4 4"/>
+              <circle cx="50" cy="50" r="22" stroke="#38bdf8" stroke-width="1.5" opacity="0.6"/>
+              <circle cx="50" cy="50" r="6" fill="#38bdf8"/>
+              <circle cx="50" cy="14" r="3.5" fill="#fbbf24"/>
+              <circle cx="81" cy="68" r="3.5" fill="#10b981"/>
+              <circle cx="19" cy="68" r="3.5" fill="#a78bfa"/>
+            </svg>
+          </div>
+          <h3>Muestra bajo análisis</h3>
+          <p>Leé la pista disponible en el panel izquierdo. Si necesitás más datos, solicitá la siguiente pista de a una antes de elegir un símbolo.</p>
+        </div>
+
+        <!-- Panel de devolución al responder -->
+        <div class="feedback-panel" id="feedbackPanel">
+          <div class="feedback-banner" id="feedbackBanner">
+            <div class="feedback-status" id="feedbackStatus"></div>
+            <div class="points-earned" id="feedbackPoints"></div>
+          </div>
+
+          <div class="visual-dossier-top">
+            <div class="pt-tile" id="ptTile">
+              <div class="pt-z" id="ptZ">Z</div>
+              <div class="pt-sym" id="ptSym">X</div>
+              <div class="pt-name" id="ptName">Elemento</div>
+            </div>
+
+            <div class="element-illustration-box">
+              <div id="elementIllustration"></div>
+              <div class="illustration-caption" id="illustrationCaption"></div>
+            </div>
+          </div>
+
+          <div class="dossier-details">
+            <h4 id="dossierTitle">Nombre del Elemento (Símbolo)</h4>
+            <div class="badges-row" id="dossierBadges"></div>
+            <div class="explanation-text" id="dossierExplanation"></div>
+          </div>
+
+          <div class="next-action">
+            <button class="btn btn-primary" id="btnNextCase">Siguiente expediente →</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PANTALLA 3: RESULTADOS FINALES -->
+  <section id="screenSummary" class="screen">
+    <div class="summary-card">
+      <div class="summary-header">
+        <div class="rank-badge" id="finalRank">INFORME DE MISIÓN COMPLETADO</div>
+        <h2>Resultados de la Investigación</h2>
+        <p style="color: var(--text-muted);" id="finalMessage">Has finalizado el análisis de todas las muestras.</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="num" id="statScore" style="color: var(--accent-amber);">0</div>
+          <div class="lbl">Puntaje Total</div>
+        </div>
+        <div class="stat-card">
+          <div class="num" id="statCorrect" style="color: var(--accent-emerald);">0 / 0</div>
+          <div class="lbl">Elementos Identificados</div>
+        </div>
+        <div class="stat-card">
+          <div class="num" id="statAccuracy">0%</div>
+          <div class="lbl">Precisión</div>
+        </div>
+      </div>
+
+      <div class="options-section-title">Registro de expedientes analizados:</div>
+      <div class="review-list" id="reviewList"></div>
+
+      <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+        <button class="btn btn-primary" id="btnPlayAgain">Iniciar nueva partida (orden y pistas nuevas)</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Físico-Química • 2.º Año Secundaria • Clasificación periódica: Metales, No Metales y Gases Nobles
+  </footer>
+</div>
+
+<script>
+/**
+ * Ilustraciones vectoriales (SVG) personalizadas para cada elemento químico
+ * que se muestran en la ficha de devolución educativa.
+ */
+const ELEMENT_ILLUSTRATIONS = {
+  Fe: {
+    caption: "Lingote de hierro e imán (magnetismo)",
+    svg: `<svg viewBox="0 0 160 80" fill="none">
+      <polygon points="22,55 42,35 88,35 72,55" fill="#94a3b8" stroke="#cbd5e1" stroke-width="1.5"/>
+      <polygon points="22,55 72,55 72,66 22,66" fill="#64748b" stroke="#cbd5e1" stroke-width="1.5"/>
+      <polygon points="72,55 88,35 88,46 72,66" fill="#475569" stroke="#cbd5e1" stroke-width="1.5"/>
+      <path d="M112 24 H128 C138 24 144 31 144 40 C144 49 138 56 128 56 H112" stroke="#f43f5e" stroke-width="8" stroke-linecap="round"/>
+      <rect x="106" y="20" width="10" height="8" fill="#e2e8f0"/>
+      <rect x="106" y="52" width="10" height="8" fill="#e2e8f0"/>
+    </svg>`
+  },
+  Cu: {
+    caption: "Cable conductor de cobre rojizo",
+    svg: `<svg viewBox="0 0 160 80" fill="none">
+      <rect x="18" y="28" width="65" height="24" rx="4" fill="#0284c7" stroke="#38bdf8" stroke-width="1.5"/>
+      <line x1="83" y1="33" x2="140" y2="24" stroke="#f97316" stroke-width="3" stroke-linecap="round"/>
+      <line x1="83" y1="38" x2="144" y2="36" stroke="#fb923c" stroke-width="3" stroke-linecap="round"/>
+      <line x1="83" y1="43" x2="142" y2="47" stroke="#f97316" stroke-width="3" stroke-linecap="round"/>
+      <line x1="83" y1="48" x2="136" y2="57" stroke="#ea580c" stroke-width="3" stroke-linecap="round"/>
+    </svg>`
+  },
+  Al: {
+    caption: "Lata liviana y lámina de aluminio",
+    svg: `<svg viewBox="0 0 160 80" fill="none">
+      <rect x="52" y="16" width="38" height="50" rx="6" fill="#cbd5e1" stroke="#f1f5f9" stroke-width="1.5"/>
+      <ellipse cx="71" cy="16" rx="19" ry="4" fill="#94a3b8" stroke="#f1f5f9" stroke-width="1.5"/>
+      <line x1="52" y1="30" x2="90" y2="30" stroke="#38bdf8" stroke-width="4"/>
+      <line x1="52" y1="52" x2="90" y2="52" stroke="#38bdf8" stroke-width="4"/>
+      <path d="M104 42 L134 34 L142 62 L110 66 Z" fill="#e2e8f0" opacity="0.85" stroke="#94a3b8"/>
+    </svg>`
+  },
+  Au: {
+    caption: "Lingote y anillo de oro amarillo",
+    svg: `<svg viewBox="0 0 160 80" fill="none">
+      <polygon points="26,56 44,34 86,34 72,56" fill="#fde047" stroke="#fef08a" stroke-width="1.5"/>
+      <polygon points="26,56 72,56 72,66 26,66" fill="#eab308" stroke="#fef08a" stroke-width="1.5"/>
+      <polygon points="72,56 86,34 86,44 72,66" fill="#ca8a04" stroke="#fef08a" stroke-width="1.5"/>
+      <circle cx="118" cy="46" r="16" stroke="#facc15" stroke-width="5"/>
+      <polygon points="118,22 124,28 118,33 112,28" fill="#38bdf8"/>
+    </svg>`
+  },
+  Ag: {
+    caption: "Medalla brillante y circuitos de plata",
+    svg: `<svg viewBox="0 0 160 80" fill="none">
+      <circle cx="62" cy="44" r="22" fill="#e2e8f0" stroke="#ffffff" stroke-width="2"/>
+      <circle cx="62" cy="44" r="15" stroke="#94a3b8" stroke-width="1.5"/>
+      <path d="M54 34 L70 54 M62 32 L72 45" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+      <path d="M98 28 H118 L128 40 H142 M98 54 H115 L125 46 H142" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="142" cy="40" r="3" fill="#38bdf8"/>
+      <circle cx="142" cy="46" r="3" fill="#38bdf8"/>
+    </svg>`
+  },
+  Na: {
+    caption: "Metal blando reactivo + sal (NaCl)",
+    svg: `<svg viewBox="0 0 160 80" fill="none">
+      <rect x="28" y="28" width="38" height="32" rx="4" fill="#cbd5e1" stroke="#f8fafc" stroke-width="1.5"/>
+      <path d="M48 20 L68 42" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="96" y="26" width="32" height="36" rx="6" fill="rgba(241,245,249,0.15)" stroke="#94a3b8" stroke-width="1.5"/>
+      <rect x="102" y="19" width="20" height="7" rx="2" fill="#64748b"/>
+      <circle cx="107" cy="50" r="2" fill="#fff"/>
+      <circle cx="115" cy="48" r="2" fill="#fff"/>
+      <circle cx="111" cy="55" r="2" fill="#fff"/>
+      <circle cx="120" cy="54" r="2" fill="#fff"/>
+    </svg>`
+  },
+  Ca: {
+    caption: "Mineral calcáreo y estructura ósea",
+    svg: `<svg viewBox="0 0 160 80" fill="none">
+      <path d="M36 28 C30 22 22 28 28 36 L68 54 C74 62 82 56 76 48 C82 42 74 34 68 42 L36 28 C42 20 34 14 28 22 Z" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+      <polygon points="104,58 118,26 136,34 142,58" fill="#cbd5e1" stroke="#f8fafc" stroke-width="1.5"/>
+    </svg>`
+  },
+  Mg: {
+    caption: "Cinta de magnesio con llama blanca intensa",
+    svg: `<svg viewBox="0 0 160 80" fill="none">
+      <path d="M24 54 Q56 48 86 42" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="96" cy="40" r="18" fill="rgba(255, 255, 255, 0.25)"/>
+      <circle cx="96" cy="40" r="10" fill="#ffffff"/>
+      <path d="M96 14 V24 M96 56 V66 M70 40 H80 M112 40 H122 M78 22 L85 29 M107 51 L114 58 M114 22 L107 29 M85 51 L78 58" stroke="#fef08a" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>`
+  },
+  Zn: {
+    caption: "Chapa galvanizada anticorrosión",
+    svg: `<svg viewBox="0 0 160 80" fill="none">
+      <path d="M26 30 Q38 20 50 30 T74 30 T98 30 T122 30 L132 54 Q120 44 108 54 T84 54 T60 54 T36 54 Z" fill="#94a3b8" stroke="#e2e8f0" stroke-width="1.8"/>
+      <path d="M44 38 L52 46 M76 36 L84 44 M106 38 L114 46" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+    </svg>`
+  },
+  O: {
+    caption: "Molécula diatómica de oxígeno en el aire",
+    svg: `<svg viewBox="0 0 160 80" fill="none">
+      <circle cx="64" cy="40" r="18" fill="rgba(16, 185, 129, 0.28)" stroke="#10b981" stroke-width="2.5"/>
+      <circle cx="96" cy="40" r="18" fill="rgba(16, 185, 129, 0.28)" stroke="#10b981" stroke-width="2.5"/>
+      <text x="61" y="44" text-anchor="middle" fill="#fff" font-family="sans-serif" font-weight="bold" font-size="13">O</text>
+      <text x="99" y="44" text-anchor="middle" fill="#fff" font-family="sans-serif" font-weight="bold" font-size="13">O</text>
+    </svg>`
+  },
+  C: {
+    caption: "Grafito (lápiz) y estructura de diamante",
+    svg: `<svg viewBox="0 0 160 80" fill="none">
+      <polygon points="32,54 58,28 66,36 40,62" fill="#fbbf24" stroke="#f59e0b"/>
+      <polygon points="32,54 40,62 26,66" fill="#334155"/>
+      <polygon points="106,24 126,24 136,38 116,62 96,38" fill="rgba(56, 189, 248, 0.22)" stroke="#38bdf8" stroke-width="2"/>
+      <line x1="96" y1="38" x2="136" y2="38" stroke="#38bdf8" stroke-width="1.5"/>
+    </svg>`
+  },
+  H: {
+    caption: "El gas más liviano (estrellas y agua)",
+    svg: `<svg viewBox="0 0 160 80" fill="none">
+      <circle cx="56" cy="40" r="16" stroke="#10b981" stroke-width="2" stroke-dasharray="3 3"/>
+      <circle cx="56" cy="40" r="5" fill="#10b981"/>
+      <circle cx="56" cy="24" r="3" fill="#38bdf8"/>
+      <path d="M110 22 C110 22 96 40 96 49 C96 57 102 63 110 63 C118 63 124 57 124 49 C124 40 110 22 110 22 Z" fill="rgba(56, 189, 248, 0.3)" stroke="#38bdf8" stroke-width="2"/>
+    </svg>`
+  },
+  S: {
+    caption: "Cristales amarillos quebradizos de azufre",
+    svg: `<svg viewBox="0 0 160 80" fill="none">
+      <polygon points="44,58 58,26 76,34 72,60" fill="#facc15" stroke="#fef08a" stroke-width="1.5"/>
+      <polygon points="72,60 84,22 104,32 98,60" fill="#eab308" stroke="#fef08a" stroke-width="1.5"/>
+      <polygon points="98,60 110,38 124,46 118,60" fill="#fde047" stroke="#fef08a" stroke-width="1.5"/>
+    </svg>`
+  },
+  Cl: {
+    caption: "Gas amarillo verdoso y desinfección de agua",
+    svg: `<svg viewBox="0 0 160 80" fill="none">
+      <circle cx="54" cy="40" r="18" fill="rgba(163, 230, 53, 0.25)" stroke="#a3e635" stroke-width="2"/>
+      <circle cx="72" cy="42" r="14" fill="rgba(163, 230, 53, 0.2)" stroke="#a3e635" stroke-width="1.5"/>
+      <path d="M104 46 Q114 38 124 46 T144 46" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M104 55 Q114 47 124 55 T144 55" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>`
+  },
+  N: {
+    caption: "78 % del aire de la atmósfera terrestre",
+    svg: `<svg viewBox="0 0 160 80" fill="none">
+      <path d="M36 52 H118 C126 52 132 46 132 39 C132 32 126 27 119 27 C116 19 108 14 99 14 C89 14 81 20 79 29 C76 28 73 27 70 27 C61 27 54 33 53 41 C44 41 36 46 36 52 Z" fill="rgba(16, 185, 129, 0.2)" stroke="#10b981" stroke-width="2"/>
+      <text x="86" y="42" text-anchor="middle" fill="#f1f5f9" font-family="monospace" font-weight="bold" font-size="13">N₂ 78%</text>
+    </svg>`
+  },
+  He: {
+    caption: "Globo aerostático / helio liviano e inerte",
+    svg: `<svg viewBox="0 0 160 80" fill="none">
+      <ellipse cx="80" cy="32" rx="18" ry="22" fill="rgba(167, 139, 250, 0.32)" stroke="#a78bfa" stroke-width="2.2"/>
+      <polygon points="77,54 83,54 80,58" fill="#a78bfa"/>
+      <path d="M80 58 Q76 66 82 72" stroke="#cbd5e1" stroke-width="1.5" fill="none"/>
+    </svg>`
+  },
+  Ne: {
+    caption: "Tubo luminoso de neón rojo anaranjado",
+    svg: `<svg viewBox="0 0 160 80" fill="none">
+      <rect x="24" y="20" width="112" height="40" rx="10" fill="#0f172a" stroke="#fb7185" stroke-width="2.5"/>
+      <text x="80" y="46" text-anchor="middle" fill="#fb7185" font-family="monospace" font-weight="bold" font-size="18" letter-spacing="3">NEÓN</text>
+    </svg>`
+  },
+  Ar: {
+    caption: "Atmósfera inerte protectora en lámparas",
+    svg: `<svg viewBox="0 0 160 80" fill="none">
+      <path d="M66 48 C60 42 58 35 58 29 C58 18 68 10 80 10 C92 10 102 18 102 29 C102 35 100 42 94 48 H66 Z" fill="rgba(167, 139, 250, 0.22)" stroke="#a78bfa" stroke-width="2"/>
+      <rect x="70" y="48" width="20" height="12" rx="2" fill="#94a3b8"/>
+      <path d="M74 48 V34 L77 30 L80 34 L83 30 L86 34 V48" stroke="#fbbf24" stroke-width="1.8" fill="none"/>
+    </svg>`
+  }
+};
+
+/**
+ * Base de datos científica de 18 elementos químicos comunes.
+ * Se presenta 1 pista inicial y hasta 3 pistas adicionales (1 por vez),
+ * seleccionadas aleatoriamente en cada partida.
+ */
+const ELEMENTS_DB = [
+  // ================= METALES =================
+  {
+    symbol: "Fe",
+    name: "Hierro",
+    z: 26,
+    category: "Metal",
+    catClass: "metal",
+    group: "Grupo 8",
+    period: "Período 4",
+    clues: [
+      { type: "Ubicación", text: "Se ubica en el grupo 8 y en el período 4 de la tabla periódica." },
+      { type: "Propiedad física", text: "Es un sólido gris plateado con brillo metálico que posee propiedades magnéticas muy marcadas (es atraído por imanes)." },
+      { type: "Vida cotidiana", text: "Es el componente principal del acero con el que se fabrican vigas, herramientas, clavos y carrocerías." },
+      { type: "Propiedad química", text: "Al quedar expuesto al aire húmedo se oxida formando una capa rojiza y escamosa conocida comúnmente como herrumbre." }
+    ],
+    explanation: "El hierro (Fe) es un metal ubicado en el grupo 8 y período 4. Presenta brillo metálico, alta resistencia, magnetismo y buena conductividad térmica y eléctrica. Al oxidarse con la humedad forma herrumbre y es la base para fabricar acero."
+  },
+  {
+    symbol: "Cu",
+    name: "Cobre",
+    z: 29,
+    category: "Metal",
+    catClass: "metal",
+    group: "Grupo 11",
+    period: "Período 4",
+    clues: [
+      { type: "Propiedad física", text: "A diferencia de la mayoría de los metales que son grises o plateados, este sólido tiene un característico color rojizo anaranjado y brillo metálico." },
+      { type: "Ubicación", text: "Se encuentra en el grupo 11 y en el período 4 de la tabla periódica." },
+      { type: "Vida cotidiana", text: "Por su excelente conductividad eléctrica y ductilidad, se estira en hilos finos para fabricar casi todos los cables eléctricos domiciliarios." },
+      { type: "Propiedad química", text: "Con el paso del tiempo, al reaccionar con el aire y la humedad, desarrolla una pátina verdosa en su superficie." }
+    ],
+    explanation: "El cobre (Cu) es un metal del grupo 11 y período 4. Su color rojizo característico, su altísima conductividad eléctrica y su ductilidad lo convierten en el material ideal para cables eléctricos y tuberías."
+  },
+  {
+    symbol: "Al",
+    name: "Aluminio",
+    z: 13,
+    category: "Metal",
+    catClass: "metal",
+    group: "Grupo 13",
+    period: "Período 3",
+    clues: [
+      { type: "Ubicación", text: "Está ubicado en el grupo 13 y en el período 3 de la tabla periódica." },
+      { type: "Vida cotidiana", text: "Es un sólido plateado muy liviano y maleable con el que se fabrican latas de bebidas, papel metálico de cocina y marcos de ventanas." },
+      { type: "Propiedad física", text: "Posee baja densidad en comparación con otros metales de uso cotidiano y conduce muy bien el calor y la electricidad." },
+      { type: "Propiedad química", text: "Al contacto con el aire forma rápidamente una capa transparente y muy fina de óxido que lo protege de seguir corroiéndose." }
+    ],
+    explanation: "El aluminio (Al) es un metal del grupo 13 y período 3. Combina brillo metálico, buena conductividad y gran maleabilidad con una densidad muy baja, por lo que se usa en envases, utensilios y estructuras livianas."
+  },
+  {
+    symbol: "Au",
+    name: "Oro",
+    z: 79,
+    category: "Metal",
+    catClass: "metal",
+    group: "Grupo 11",
+    period: "Período 6",
+    clues: [
+      { type: "Propiedad física", text: "Es un metal sólido denso, blando y muy maleable, reconocible por su intenso color amarillo brillante." },
+      { type: "Ubicación", text: "Pertenece al grupo 11 y se ubica en el período 6 de la tabla periódica." },
+      { type: "Propiedad química", text: "Es extremadamente poco reactivo: no se oxida ni pierde su brillo al contacto con el aire o el agua." },
+      { type: "Vida cotidiana", text: "Se emplea en joyería y también en contactos de circuitos electrónicos de alta precisión porque no se corroe." }
+    ],
+    explanation: "El oro (Au) es un metal del grupo 11 y período 6. Su color amarillo brillante, su altísima resistencia a la corrosión y su extrema maleabilidad son propiedades típicas de los llamados metales nobles."
+  },
+  {
+    symbol: "Ag",
+    name: "Plata",
+    z: 47,
+    category: "Metal",
+    catClass: "metal",
+    group: "Grupo 11",
+    period: "Período 5",
+    clues: [
+      { type: "Ubicación", text: "Se localiza en el grupo 11 y en el período 5 de la tabla periódica." },
+      { type: "Propiedad física", text: "Es el elemento metálico que mejor conduce la electricidad y el calor de toda la tabla periódica, con un brillo blanco metálico muy intenso." },
+      { type: "Vida cotidiana", text: "Se utiliza en joyería fina, espejos de alta calidad y componentes electrónicos." },
+      { type: "Propiedad química", text: "No reacciona fácilmente con el oxígeno puro, pero se oscurece lentamente al reaccionar con compuestos de azufre presentes en el ambiente." }
+    ],
+    explanation: "La plata (Ag) es un metal ubicado en el grupo 11 y período 5. Posee el mayor brillo reflectante y la máxima conductividad eléctrica y térmica entre todos los metales."
+  },
+  {
+    symbol: "Na",
+    name: "Sodio",
+    z: 11,
+    category: "Metal",
+    catClass: "metal",
+    group: "Grupo 1",
+    period: "Período 3",
+    clues: [
+      { type: "Ubicación", text: "Pertenece al grupo 1 (metales alcalinos) y se encuentra en el período 3." },
+      { type: "Propiedad química", text: "Es un metal tan blando que puede cortarse con un cuchillo, pero reacciona de forma muy violenta al entrar en contacto con el agua." },
+      { type: "Vida cotidiana", text: "Aunque en estado puro es muy reactivo, combinado con cloro forma la sal común de mesa." },
+      { type: "Propiedad física", text: "Cuando está recién cortado tiene brillo plateado y conduce la electricidad, pero debe guardarse sumergido en aceite mineral para aislarlo del aire." }
+    ],
+    explanation: "El sodio (Na) es un metal alcalino del grupo 1 y período 3. Como buen metal, conduce la electricidad y tiene brillo plateado cuando está puro, aunque es muy blando y reacciona intensamente con el agua."
+  },
+  {
+    symbol: "Ca",
+    name: "Calcio",
+    z: 20,
+    category: "Metal",
+    catClass: "metal",
+    group: "Grupo 2",
+    period: "Período 4",
+    clues: [
+      { type: "Ubicación", text: "Se ubica en el grupo 2 (metales alcalinotérreos) y en el período 4 de la tabla periódica." },
+      { type: "Vida cotidiana", text: "En estado puro es un metal plateado, pero sus compuestos son fundamentales para formar nuestros huesos y dientes, así como el mármol y la tiza." },
+      { type: "Propiedad química", text: "Es un metal reactivo que no se encuentra libre en la naturaleza, sino formando sales y minerales; reacciona con el agua liberando gas hidrógeno." },
+      { type: "Propiedad física", text: "Es un sólido de color blanco plateado, más duro que el sodio pero más blando que el hierro, que conduce la electricidad." }
+    ],
+    explanation: "El calcio (Ca) es un metal alcalinotérreo del grupo 2 y período 4. En estado elemental es un sólido metálico plateado y conductor, mientras que en la naturaleza forma parte de minerales, huesos y dientes."
+  },
+  {
+    symbol: "Mg",
+    name: "Magnesio",
+    z: 12,
+    category: "Metal",
+    catClass: "metal",
+    group: "Grupo 2",
+    period: "Período 3",
+    clues: [
+      { type: "Ubicación", text: "Está situado en el grupo 2 (metales alcalinotérreos) y en el período 3 de la tabla periódica." },
+      { type: "Propiedad química", text: "Es un metal sólido liviano y plateado que, al encenderse, arde con una llama blanca sumamente brillante e intensa." },
+      { type: "Vida cotidiana", text: "Se usa en aleaciones livianas para bicicletas y aeronaves, y también en bengalas o fuegos artificiales por su luz blanca." },
+      { type: "Clasificación", text: "Presenta brillo metálico, es maleable y conduce tanto el calor como la corriente eléctrica." }
+    ],
+    explanation: "El magnesio (Mg) es un metal del grupo 2 y período 3. Es un sólido plateado, liviano y buen conductor que se caracteriza por arder con una luz blanca muy intensa."
+  },
+  {
+    symbol: "Zn",
+    name: "Zinc",
+    z: 30,
+    category: "Metal",
+    catClass: "metal",
+    group: "Grupo 12",
+    period: "Período 4",
+    clues: [
+      { type: "Ubicación", text: "Se encuentra en el grupo 12 y en el período 4 de la tabla periódica." },
+      { type: "Vida cotidiana", text: "Se utiliza para recubrir chapas y piezas de acero (proceso llamado galvanizado) con el fin de evitar que se oxiden." },
+      { type: "Propiedad física", text: "Es un metal sólido de color blanco azulado brillante, buen conductor de la electricidad y el calor." },
+      { type: "Vida cotidiana", text: "Al combinarse con cobre forma el latón, una aleación dorada usada en llaves, cerraduras e instrumentos musicales." }
+    ],
+    explanation: "El zinc (Zn) es un metal del grupo 12 y período 4. Tiene brillo blanco azulado, conduce bien la electricidad y se emplea ampliamente en el galvanizado para proteger al hierro de la corrosión."
+  },
+
+  // ================= NO METALES =================
+  {
+    symbol: "O",
+    name: "Oxígeno",
+    z: 8,
+    category: "No metal",
+    catClass: "nonmetal",
+    group: "Grupo 16",
+    period: "Período 2",
+    clues: [
+      { type: "Ubicación", text: "Se ubica en el grupo 16 y en el período 2 de la tabla periódica." },
+      { type: "Vida cotidiana", text: "Es un gas incoloro que representa cerca del 21 % del aire que respiramos y es indispensable para la respiración celular y la combustión." },
+      { type: "Propiedad física", text: "A temperatura ambiente es un gas sin color ni olor y no conduce la electricidad ni el calor." },
+      { type: "Propiedad química", text: "Es muy reactivo: participa en las combustiones y se combina con muchos metales formando óxidos." }
+    ],
+    explanation: "El oxígeno (O) es un no metal del grupo 16 y período 2. A temperatura ambiente es un gas aislante muy reactivo, esencial para la respiración de los seres vivos y los procesos de combustión."
+  },
+  {
+    symbol: "C",
+    name: "Carbono",
+    z: 6,
+    category: "No metal",
+    catClass: "nonmetal",
+    group: "Grupo 14",
+    period: "Período 2",
+    clues: [
+      { type: "Ubicación", text: "Se encuentra en el grupo 14 y en el período 2 de la tabla periódica." },
+      { type: "Propiedad física", text: "Es un sólido a temperatura ambiente que puede presentarse en formas muy distintas: como grafito negro y blando (en lápices) o como diamante transparente y extremadamente duro." },
+      { type: "Vida cotidiana", text: "Es el elemento central de todos los compuestos orgánicos presentes en los seres vivos y también forma el carbón." },
+      { type: "Clasificación", text: "Es un no metal sólido; en su forma de diamante es transparente y aislante eléctrico, mientras que el grafito es opaco y quebradizo." }
+    ],
+    explanation: "El carbono (C) es un no metal sólido del grupo 14 y período 2. Sus átomos pueden ordenarse de distintas maneras (como en el grafito o el diamante) y constituyen la base química de toda la materia viva."
+  },
+  {
+    symbol: "H",
+    name: "Hidrógeno",
+    z: 1,
+    category: "No metal",
+    catClass: "nonmetal",
+    group: "Grupo 1",
+    period: "Período 1",
+    clues: [
+      { type: "Ubicación", text: "Es el primer elemento de la tabla periódica: está en el período 1 y encabeza el grupo 1, aunque no es un metal." },
+      { type: "Propiedad física", text: "Es el gas más liviano que existe; es incoloro, inodoro y mal conductor de la electricidad." },
+      { type: "Vida cotidiana", text: "Es el elemento más abundante del Universo (componente principal de las estrellas) y junto con el oxígeno forma el agua." },
+      { type: "Propiedad química", text: "Es un gas muy inflamable que reacciona con el oxígeno liberando gran cantidad de energía y formando agua." }
+    ],
+    explanation: "El hidrógeno (H) es un no metal ubicado en el grupo 1 y período 1. Es el gas más ligero y abundante del Universo; a diferencia de los metales de su columna, es un gas aislante a temperatura ambiente."
+  },
+  {
+    symbol: "S",
+    name: "Azufre",
+    z: 16,
+    category: "No metal",
+    catClass: "nonmetal",
+    group: "Grupo 16",
+    period: "Período 3",
+    clues: [
+      { type: "Propiedad física", text: "A temperatura ambiente es un sólido de color amarillo intenso, opaco, muy quebradizo (se pulveriza al golpearlo) y aislante eléctrico." },
+      { type: "Ubicación", text: "Se localiza en el grupo 16 y en el período 3 de la tabla periódica." },
+      { type: "Vida cotidiana", text: "Se encuentra en zonas volcánicas, se utiliza para fabricar pólvora, fósforos y ácido sulfúrico, y sus compuestos dan olor característico a huevos podridos." },
+      { type: "Clasificación", text: "Es un ejemplo clásico de no metal sólido: carece de brillo metálico, no es maleable y no conduce la corriente eléctrica." }
+    ],
+    explanation: "El azufre (S) es un no metal sólido del grupo 16 y período 3. Su color amarillo, su fragilidad al golpearlo y su incapacidad para conducir el calor o la electricidad lo distinguen claramente de los metales."
+  },
+  {
+    symbol: "Cl",
+    name: "Cloro",
+    z: 17,
+    category: "No metal",
+    catClass: "nonmetal",
+    group: "Grupo 17",
+    period: "Período 3",
+    clues: [
+      { type: "Ubicación", text: "Pertenece al grupo 17 (halógenos) y se ubica en el período 3 de la tabla periódica." },
+      { type: "Propiedad física", text: "A temperatura ambiente es un gas de color amarillo verdoso con un olor penetrante e irritante, y no conduce la electricidad." },
+      { type: "Vida cotidiana", text: "Sus derivados se utilizan ampliamente para potabilizar el agua de red y desinfectar piletas de natación." },
+      { type: "Propiedad química", text: "Es un no metal muy reactivo que se combina fácilmente con metales como el sodio para formar sales." }
+    ],
+    explanation: "El cloro (Cl) es un no metal del grupo 17 y período 3. A temperatura ambiente es un gas amarillo verdoso muy reactivo y aislante, muy conocido por su papel en la desinfección del agua."
+  },
+  {
+    symbol: "N",
+    name: "Nitrógeno",
+    z: 7,
+    category: "No metal",
+    catClass: "nonmetal",
+    group: "Grupo 15",
+    period: "Período 2",
+    clues: [
+      { type: "Ubicación", text: "Se ubica en el grupo 15 y en el período 2 de la tabla periódica." },
+      { type: "Vida cotidiana", text: "Es un gas incoloro e inodoro que constituye aproximadamente el 78 % de la atmósfera terrestre, siendo el gas más abundante del aire." },
+      { type: "Propiedad física", text: "A temperatura ambiente es un gas mal conductor del calor y la electricidad; enfriado a temperaturas muy bajas se usa como líquido refrigerante." },
+      { type: "Propiedad química", text: "A temperatura ambiente es poco reactivo en el aire, aunque forma parte esencial de las proteínas, el ADN y los fertilizantes." }
+    ],
+    explanation: "El nitrógeno (N) es un no metal del grupo 15 y período 2. Es un gas incoloro y aislante que forma casi cuatro quintas partes del aire que nos rodea y es clave en fertilizantes y biomoléculas."
+  },
+
+  // ================= GASES NOBLES =================
+  {
+    symbol: "He",
+    name: "Helio",
+    z: 2,
+    category: "Gas noble",
+    catClass: "noble",
+    group: "Grupo 18",
+    period: "Período 1",
+    clues: [
+      { type: "Ubicación", text: "Se encuentra en el extremo superior derecho de la tabla: grupo 18 y período 1." },
+      { type: "Vida cotidiana", text: "Es un gas incoloro, ininflamable y mucho más liviano que el aire, por lo que se usa para inflar globos que flotan y dirigibles." },
+      { type: "Propiedad química", text: "Es químicamente inerte: prácticamente no forma compuestos con ningún otro elemento." },
+      { type: "Clasificación", text: "Es el más liviano de los gases nobles; a diferencia del hidrógeno, no es inflamable." }
+    ],
+    explanation: "El helio (He) es un gas noble situado en el grupo 18 y período 1. Al igual que los demás gases nobles, es un gas incoloro y sumamente estable que no reacciona químicamente, y por su baja densidad hace flotar los globos."
+  },
+  {
+    symbol: "Ne",
+    name: "Neón",
+    z: 10,
+    category: "Gas noble",
+    catClass: "noble",
+    group: "Grupo 18",
+    period: "Período 2",
+    clues: [
+      { type: "Ubicación", text: "Pertenece al grupo 18 y se ubica en el período 2 de la tabla periódica." },
+      { type: "Vida cotidiana", text: "Es un gas incoloro en condiciones normales, pero al pasar una descarga eléctrica a través de él dentro de un tubo emite una intensa luz rojo anaranjada usada en carteles luminosos." },
+      { type: "Propiedad química", text: "No reacciona con otros elementos químicos debido a su gran estabilidad." },
+      { type: "Clasificación", text: "Forma parte de la familia de los gases nobles, ubicados en la última columna de la tabla periódica." }
+    ],
+    explanation: "El neón (Ne) es un gas noble del grupo 18 y período 2. Es un gas incoloro y químicamente inerte que resplandece con un brillo rojo anaranjado intenso cuando se lo excita con corriente eléctrica."
+  },
+  {
+    symbol: "Ar",
+    name: "Argón",
+    z: 18,
+    category: "Gas noble",
+    catClass: "noble",
+    group: "Grupo 18",
+    period: "Período 3",
+    clues: [
+      { type: "Ubicación", text: "Se encuentra en el grupo 18 y en el período 3 de la tabla periódica." },
+      { type: "Vida cotidiana", text: "Es el gas noble más abundante en la atmósfera terrestre (casi 1 % del aire) y se usa dentro de lámparas incandescentes y soldaduras para evitar que los metales se oxiden." },
+      { type: "Propiedad química", text: "Es un gas incoloro e inodoro que no reacciona con el filamento caliente de una lámpara, creando una atmósfera protectora inerte." },
+      { type: "Clasificación", text: "Pertenece al grupo de los gases nobles, caracterizados por su muy baja reactividad química." }
+    ],
+    explanation: "El argón (Ar) es un gas noble ubicado en el grupo 18 y período 3. Su total falta de reactividad química lo hace muy útil para crear ambientes protectores dentro de lámparas y equipos de soldadura."
+  }
+];
+
+// Estado global de la aplicación
+const state = {
+  deck: [],
+  currentIndex: 0,
+  score: 0,
+  correctCount: 0,
+  currentElement: null,
+  displayedClues: [],
+  remainingClues: [],
+  extraCluesUsed: 0,
+  answered: false,
+  history: []
+};
+
+// Referencias DOM
+const screens = {
+  intro: document.getElementById("screenIntro"),
+  game: document.getElementById("screenGame"),
+  summary: document.getElementById("screenSummary")
+};
+
+const hudStats = document.getElementById("hudStats");
+const progressTrack = document.getElementById("progressTrack");
+const progressFill = document.getElementById("progressFill");
+const hudProgress = document.getElementById("hudProgress");
+const hudScore = document.getElementById("hudScore");
+
+const caseBadge = document.getElementById("caseBadge");
+const potentialPointsBadge = document.getElementById("potentialPointsBadge");
+const cluesContainer = document.getElementById("cluesContainer");
+const btnExtraClue = document.getElementById("btnExtraClue");
+const hintInfoText = document.getElementById("hintInfoText");
+const symbolsContainer = document.getElementById("symbolsContainer");
+
+const standbyBox = document.getElementById("standbyBox");
+const rightStatusTag = document.getElementById("rightStatusTag");
+const feedbackPanel = document.getElementById("feedbackPanel");
+const feedbackBanner = document.getElementById("feedbackBanner");
+const feedbackStatus = document.getElementById("feedbackStatus");
+const feedbackPoints = document.getElementById("feedbackPoints");
+const ptTile = document.getElementById("ptTile");
+const ptZ = document.getElementById("ptZ");
+const ptSym = document.getElementById("ptSym");
+const ptName = document.getElementById("ptName");
+const elementIllustration = document.getElementById("elementIllustration");
+const illustrationCaption = document.getElementById("illustrationCaption");
+const dossierTitle = document.getElementById("dossierTitle");
+const dossierBadges = document.getElementById("dossierBadges");
+const dossierExplanation = document.getElementById("dossierExplanation");
+const btnNextCase = document.getElementById("btnNextCase");
+
+// Algoritmo Fisher-Yates para orden aleatorio
+function shuffleArray(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function showScreen(screenName) {
+  Object.values(screens).forEach(s => s.classList.remove("active"));
+  screens[screenName].classList.add("active");
+}
+
+function startNewGame() {
+  const count = parseInt(document.getElementById("caseCountSelect").value, 10) || 10;
+  const shuffledElements = shuffleArray(ELEMENTS_DB);
+  state.deck = shuffledElements.slice(0, Math.min(count, shuffledElements.length));
+  state.currentIndex = 0;
+  state.score = 0;
+  state.correctCount = 0;
+  state.history = [];
+
+  hudStats.style.visibility = "visible";
+  progressTrack.style.visibility = "visible";
+  updateHUD();
+  showScreen("game");
+  loadCase(0);
+}
+
+function updateHUD() {
+  const total = state.deck.length;
+  const currentNum = Math.min(state.currentIndex + 1, total);
+  hudProgress.textContent = `${currentNum} / ${total}`;
+  hudScore.textContent = state.score;
+  const pct = (state.currentIndex / total) * 100;
+  progressFill.style.width = `${pct}%`;
+}
+
+function getPotentialPoints() {
+  return Math.max(55, 100 - state.extraCluesUsed * 15);
+}
+
+function loadCase(index) {
+  state.currentIndex = index;
+  state.currentElement = state.deck[index];
+  state.extraCluesUsed = 0;
+  state.answered = false;
+
+  updateHUD();
+
+  const el = state.currentElement;
+  caseBadge.textContent = `EXPEDIENTE #${String(index + 1).padStart(2, "0")}`;
+
+  // Mezclamos todas las pistas del elemento y mostramos SOLO 1 pista al inicio
+  const shuffledClues = shuffleArray(el.clues);
+  state.displayedClues = [{ ...shuffledClues[0], isExtra: false }];
+  state.remainingClues = shuffledClues.slice(1); // Quedan 3 pistas para revelar de a una
+
+  renderClues();
+  updateExtraClueButton();
+
+  // Generar 4 opciones de símbolos químicos (1 correcto + 3 distractores)
+  const distractors = shuffleArray(
+    ELEMENTS_DB.filter(item => item.symbol !== el.symbol)
+  ).slice(0, 3);
+
+  const options = shuffleArray([el, ...distractors]);
+  renderSymbolOptions(options);
+
+  // Reiniciar columna derecha (visor en espera, panel de resultado oculto)
+  standbyBox.style.display = "flex";
+  feedbackPanel.className = "feedback-panel";
+  rightStatusTag.textContent = "ESPERANDO HIPÓTESIS";
+  rightStatusTag.style.color = "var(--text-dim)";
+
+  btnNextCase.textContent = (index === state.deck.length - 1)
+    ? "Ver informe final →"
+    : "Siguiente expediente →";
+}
+
+function renderClues() {
+  cluesContainer.innerHTML = "";
+  state.displayedClues.forEach((clue, idx) => {
+    const card = document.createElement("div");
+    card.className = `clue-card ${clue.isExtra ? "extra-clue" : ""}`;
+    card.innerHTML = `
+      <span class="clue-type-badge">Pista ${idx + 1} • ${clue.type}</span>
+      <div class="clue-text">${clue.text}</div>
+    `;
+    cluesContainer.appendChild(card);
+  });
+
+  const totalClues = state.displayedClues.length + state.remainingClues.length;
+  hintInfoText.textContent = `Pistas reveladas: ${state.displayedClues.length} de ${totalClues}`;
+}
+
+function updateExtraClueButton() {
+  if (state.answered || state.remainingClues.length === 0) {
+    btnExtraClue.disabled = true;
+    btnExtraClue.textContent = state.remainingClues.length === 0
+      ? "Todas las pistas reveladas"
+      : "Pistas bloqueadas";
+  } else {
+    btnExtraClue.disabled = false;
+    btnExtraClue.textContent = `+ Pedir siguiente pista (-15 pts)`;
+  }
+  potentialPointsBadge.textContent = `Valor: ${getPotentialPoints()} pts`;
+}
+
+function requestExtraClue() {
+  if (state.answered || state.remainingClues.length === 0) return;
+  const nextClue = state.remainingClues.shift();
+  state.extraCluesUsed++;
+  state.displayedClues.push({ ...nextClue, isExtra: true });
+  renderClues();
+  updateExtraClueButton();
+}
+
+function renderSymbolOptions(options) {
+  symbolsContainer.innerHTML = "";
+  const letters = ["A", "B", "C", "D"];
+  options.forEach((opt, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "symbol-btn";
+    btn.dataset.symbol = opt.symbol;
+    btn.innerHTML = `
+      <span class="symbol-corner">${letters[idx]}</span>
+      <span class="symbol-text">${opt.symbol}</span>
+    `;
+    btn.addEventListener("click", () => handleAnswer(opt.symbol, btn));
+    symbolsContainer.appendChild(btn);
+  });
+}
+
+function handleAnswer(selectedSymbol, clickedBtn) {
+  if (state.answered) return;
+  state.answered = true;
+  updateExtraClueButton();
+
+  const el = state.currentElement;
+  const isCorrect = selectedSymbol === el.symbol;
+  const earned = isCorrect ? getPotentialPoints() : 0;
+
+  if (isCorrect) {
+    state.score += earned;
+    state.correctCount++;
+  }
+
+  state.history.push({
+    element: el,
+    selectedSymbol,
+    isCorrect,
+    earned
+  });
+
+  // Resaltar botones de símbolos a la izquierda
+  const allBtns = symbolsContainer.querySelectorAll(".symbol-btn");
+  allBtns.forEach(btn => {
+    btn.disabled = true;
+    const sym = btn.dataset.symbol;
+    if (sym === el.symbol) {
+      btn.classList.add("correct");
+    } else if (btn === clickedBtn && !isCorrect) {
+      btn.classList.add("incorrect");
+    } else {
+      btn.classList.add("dimmed");
+    }
+  });
+
+  // Actualizar HUD
+  hudScore.textContent = state.score;
+  const pct = ((state.currentIndex + 1) / state.deck.length) * 100;
+  progressFill.style.width = `${pct}%`;
+
+  // Mostrar devolución en la COLUMNA DERECHA
+  standbyBox.style.display = "none";
+  feedbackPanel.className = "feedback-panel visible";
+  feedbackBanner.className = `feedback-banner ${isCorrect ? "is-correct" : "is-wrong"}`;
+
+  if (isCorrect) {
+    rightStatusTag.textContent = "IDENTIFICACIÓN EXITOSA";
+    rightStatusTag.style.color = "var(--accent-emerald)";
+    feedbackStatus.className = "feedback-status ok";
+    feedbackStatus.textContent = "✓ ¡Acertaste! Elemento identificado.";
+    feedbackPoints.textContent = `+${earned} pts`;
+  } else {
+    rightStatusTag.textContent = "MUESTRA NO COINCIDE";
+    rightStatusTag.style.color = "var(--accent-rose)";
+    feedbackStatus.className = "feedback-status fail";
+    feedbackStatus.textContent = `✗ No acertaste (elegiste ${selectedSymbol}).`;
+    feedbackPoints.textContent = "+0 pts";
+  }
+
+  ptTile.className = `pt-tile ${el.catClass}`;
+  ptZ.textContent = `Z = ${el.z}`;
+  ptSym.textContent = el.symbol;
+  ptName.textContent = el.name;
+
+  // Cargar ilustración específica del elemento
+  const art = ELEMENT_ILLUSTRATIONS[el.symbol];
+  if (art) {
+    elementIllustration.innerHTML = art.svg;
+    illustrationCaption.textContent = art.caption;
+  } else {
+    elementIllustration.innerHTML = "";
+    illustrationCaption.textContent = "";
+  }
+
+  dossierTitle.textContent = `${el.name} (${el.symbol})`;
+  dossierBadges.innerHTML = `
+    <span class="meta-badge ${el.catClass}">Clasificación: ${el.category}</span>
+    <span class="meta-badge">${el.group}</span>
+    <span class="meta-badge">${el.period}</span>
+  `;
+  dossierExplanation.textContent = el.explanation;
+}
+
+function handleNext() {
+  if (state.currentIndex + 1 < state.deck.length) {
+    loadCase(state.currentIndex + 1);
+  } else {
+    showSummary();
+  }
+}
+
+function showSummary() {
+  showScreen("summary");
+  const total = state.deck.length;
+  const accuracy = Math.round((state.correctCount / total) * 100);
+
+  document.getElementById("statScore").textContent = state.score;
+  document.getElementById("statCorrect").textContent = `${state.correctCount} / ${total}`;
+  document.getElementById("statAccuracy").textContent = `${accuracy}%`;
+
+  const rankEl = document.getElementById("finalRank");
+  const msgEl = document.getElementById("finalMessage");
+
+  if (accuracy >= 90) {
+    rankEl.textContent = "RANGO: DETECTIVE QUÍMICO EXPERTO";
+    msgEl.textContent = "¡Excelente trabajo de laboratorio! Dominás la clasificación periódica y los símbolos químicos.";
+  } else if (accuracy >= 70) {
+    rankEl.textContent = "RANGO: INVESTIGADOR DE LABORATORIO";
+    msgEl.textContent = "¡Muy buen desempeño! Identificaste la mayoría de los elementos relacionando sus propiedades y ubicación.";
+  } else if (accuracy >= 50) {
+    rankEl.textContent = "RANGO: ANALISTA EN FORMACIÓN";
+    msgEl.textContent = "Buen avance. Repasá las diferencias entre metales, no metales y gases nobles e intentá mejorar tu marca.";
+  } else {
+    rankEl.textContent = "RANGO: APRENDIZ DE LABORATORIO";
+    msgEl.textContent = "Cada expediente ayuda a aprender. Leé con atención las pistas sobre propiedades y grupos en una nueva partida.";
+  }
+
+  const reviewList = document.getElementById("reviewList");
+  reviewList.innerHTML = "";
+  state.history.forEach((item, idx) => {
+    const row = document.createElement("div");
+    row.className = "review-item";
+    row.innerHTML = `
+      <div class="review-left">
+        <div class="review-sym">${item.element.symbol}</div>
+        <div>
+          <strong>#${idx + 1} ${item.element.name}</strong>
+          <div style="font-size: 0.78rem; color: var(--text-muted);">
+            ${item.element.category} • ${item.element.group}, ${item.element.period}
+          </div>
+        </div>
+      </div>
+      <div class="review-status ${item.isCorrect ? "ok" : "fail"}">
+        ${item.isCorrect ? `✓ Acertado (+${item.earned} pts)` : `✗ Elegiste ${item.selectedSymbol}`}
+      </div>
+    `;
+    reviewList.appendChild(row);
+  });
+}
+
+// Eventos
+document.getElementById("btnStart").addEventListener("click", startNewGame);
+document.getElementById("btnExtraClue").addEventListener("click", requestExtraClue);
+document.getElementById("btnNextCase").addEventListener("click", handleNext);
+document.getElementById("btnPlayAgain").addEventListener("click", startNewGame);
+document.getElementById("btnResetTop").addEventListener("click", () => {
+  hudStats.style.visibility = "hidden";
+  progressTrack.style.visibility = "hidden";
+  showScreen("intro");
+});
+</script>
+</body>
+</html>
